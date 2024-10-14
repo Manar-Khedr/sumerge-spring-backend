@@ -1,6 +1,6 @@
-package com.sumerge.implementation;
+package com.sumerge.springTask3.implementation;
 
-import com.sumerge.classes.Course;
+import com.sumerge.springTask3.classes.Course;
 
 import java.util.List;
 

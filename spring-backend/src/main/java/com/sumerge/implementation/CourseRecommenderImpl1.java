@@ -1,13 +1,14 @@
 package com.sumerge.implementation;
 
-import com.sumerge.classes.Course;
+import com.sumerge.springTask3.implementation.CourseRecommender;
 import org.springframework.stereotype.Component;
+import com.sumerge.springTask3.classes.Course;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CourseRecommenderImpl1 implements CourseRecommender{
+public class CourseRecommenderImpl1 implements CourseRecommender {
 
     @Override
     public List<Course> recommendedCourses() {
