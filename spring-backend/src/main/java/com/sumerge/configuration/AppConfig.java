@@ -1,41 +1,27 @@
 package com.sumerge.configuration;
 
-import com.sumerge.implementation.ChangedCourseRecommenderImpl2;
-import com.sumerge.implementation.CourseRecommenderImpl1;
-import com.sumerge.repository.CourseRepository;
-import com.sumerge.repository.CourseRepositoryImpl;
-import com.sumerge.service.CourseService;
-import com.sumerge.springTask3.implementation.CourseRecommender;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.sumerge.mapper.AuthorMapper;
+import com.sumerge.mapper.CourseMapper;
+import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.*;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.sumerge")
-@Import(DataSourceConfig.class)
+@EnableJpaRepositories(basePackages = "com.sumerge.repository")
+@EntityScan(basePackages = {"com.sumerge.springTask3", "com.sumerge.classes"})
 public class AppConfig {
 
+
     @Bean
-    public CourseService courseService(
-            @Qualifier("courseRecommenderImpl2") CourseRecommender courseRecommender,
-            CourseRepository courseRepository) {
-        return new CourseService(courseRecommender, courseRepository);
+    public CourseMapper courseMapper() {
+        return Mappers.getMapper(CourseMapper.class);
     }
 
     @Bean
-    @Qualifier("courseRecommenderImpl1")
-    public CourseRecommender courseRecommenderImpl1() {
-        return new CourseRecommenderImpl1();
+    public AuthorMapper authorMapper() {
+        return Mappers.getMapper(AuthorMapper.class);
     }
 
-    @Bean
-    @Qualifier("courseRecommenderImpl2")
-    public CourseRecommender courseRecommenderImpl2() {
-        return new ChangedCourseRecommenderImpl2();
-    }
-
-    @Bean
-    public CourseRepository courseRepository(JdbcTemplate jdbcTemplate) {
-        return new CourseRepositoryImpl(jdbcTemplate);
-    }
 }

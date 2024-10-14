@@ -1,38 +1,12 @@
-package com.sumerge.springTask3.classes;
+package com.sumerge.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class CourseDTO {
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "course")
-public class Course {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private int courseId;
-
-    @Column(name = "name")
     private String courseName;
-
-    @Column(name = "description")
     private String courseDescription;
-
-    @Column(name = "credit")
     private int courseCredit;
 
-    // Default constructor
-    public Course() {}
-
-    public Course(String courseName, int courseId, String courseDescription, int courseCredit) {
-        this.courseName = courseName;
-        this.courseId = courseId;
-        this.courseDescription = courseDescription;
-        this.courseCredit = courseCredit;
-    }
-
-    // Getters and setters
     public int getCourseId() {
         return courseId;
     }
