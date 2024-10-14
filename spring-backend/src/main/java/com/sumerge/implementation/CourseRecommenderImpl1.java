@@ -7,8 +7,8 @@ import com.sumerge.springTask3.classes.Course;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class CourseRecommenderImpl1 implements CourseRecommender {
+
+public class CourseRecommenderImpl1 implements CourseRecommender{
 
     @Override
     public List<Course> recommendedCourses() {
