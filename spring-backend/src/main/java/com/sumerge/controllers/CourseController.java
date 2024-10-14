@@ -1,11 +1,16 @@
 package com.sumerge.controllers;
 
+import com.sumerge.dto.CourseDTO;
+import com.sumerge.exception.ResourceNotFoundException;
 import com.sumerge.service.CourseService;
 import com.sumerge.springTask3.classes.Course;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ValidationException;
 import java.util.List;
 
 @RestController
@@ -20,53 +25,55 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    // Get mapping --> get course from database
-    @GetMapping("/{courseId}")
-    public ResponseEntity<Course> getCourse(@PathVariable int courseId) {
-        Course course = courseService.viewCourse(courseId);
-        if (course != null) {
-            return ResponseEntity.ok(course);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    // 2. Add a course
+    // add course --> post mapping
     @PostMapping
-    public ResponseEntity<Void> addCourse(@RequestBody Course course) {
-        courseService.addCourse(course);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CourseDTO> addCourse(@RequestBody CourseDTO courseDTO) {
+        try {
+            CourseDTO createdCourse = courseService.addCourse(courseDTO);
+            return new ResponseEntity<>(createdCourse, HttpStatus.OK);
+        } catch (ValidationException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
-    // 3. Update a certain course
-    @PutMapping("/{courseId}")
-    public ResponseEntity<Void> updateCourse(@PathVariable int courseId, @RequestBody Course course) {
-        Course choosenCourse = courseService.viewCourse(courseId);
-        if (choosenCourse != null) {
-            course.setId(courseId);
-            courseService.updateCourse(course);
-            return ResponseEntity.ok().build();
+    // view course by id --> get mapping
+    @GetMapping("/{courseName}")
+    public ResponseEntity<CourseDTO> viewCourse(@PathVariable String courseName) {
+        try{
+            CourseDTO course = courseService.viewCourse(courseName);
+            return new ResponseEntity<>(course, HttpStatus.OK);
+        } catch (ResourceNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.notFound().build();
     }
 
-    // 4. Delete a certain course
-    @DeleteMapping("/{courseId}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable int courseId) {
-        Course choosenCourse = courseService.viewCourse(courseId);
-        if (choosenCourse != null) {
-            courseService.deleteCourse(choosenCourse);
-            return ResponseEntity.ok().build();
+    // update course --> put mapping
+    @PutMapping("/{courseName}")
+    public ResponseEntity<CourseDTO> updateCourse(@PathVariable String courseName, @RequestBody CourseDTO courseDTO) {
+        try{
+            courseDTO.setCourseName(courseName);
+            CourseDTO updatedCourse = courseService.updateCourse(courseDTO);
+            return new ResponseEntity<>(updatedCourse, HttpStatus.OK);
+        } catch( ResourceNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.notFound().build();
     }
 
-    // 5. View all courses
-    @GetMapping
-    public ResponseEntity<List<Course>> getAllCourses() {
-        List<Course> courses = courseService.viewAllCourses();
-        if (courses != null && !courses.isEmpty()) {
-            return ResponseEntity.ok(courses);
+    // delete course by id --> delete mapping
+    @DeleteMapping("/{courseName}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable String courseName) {
+        try{
+            courseService.deleteCourse(courseName);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch(ResourceNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.notFound().build();
+    }
+
+    // view all courses using paging -- > get mapping
+    public ResponseEntity<Page<CourseDTO>> viewAllCourses(@RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "10") int size) {
+        Page<CourseDTO> authors = courseService.viewAllCourses(page, size);
+        return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 }
