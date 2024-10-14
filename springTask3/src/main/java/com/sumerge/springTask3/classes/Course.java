@@ -3,6 +3,7 @@ package com.sumerge.springTask3.classes;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "course")
@@ -10,24 +11,20 @@ public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private int courseId;
 
-    @Column(name = "name")
     private String courseName;
-
-    @Column(name = "description")
     private String courseDescription;
-
-    @Column(name = "credit")
     private int courseCredit;
+
+    @ManyToMany(mappedBy = "courses")
+    private Set<Author> authors;
 
     // Default constructor
     public Course() {}
 
-    public Course(String courseName, int courseId, String courseDescription, int courseCredit) {
+    public Course(String courseName, String courseDescription, int courseCredit){
         this.courseName = courseName;
-        this.courseId = courseId;
         this.courseDescription = courseDescription;
         this.courseCredit = courseCredit;
     }
@@ -64,4 +61,14 @@ public class Course {
     public void setCourseCredit(int courseCredit) {
         this.courseCredit = courseCredit;
     }
+
+    public Set<Author> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(Set<Author> authors) {
+        this.authors = authors;
+    }
+
+
 }

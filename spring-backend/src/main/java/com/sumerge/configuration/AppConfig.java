@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = {"com.sumerge.springTask3", "com.sumerge.classes"})
 public class AppConfig {
 
-
     @Bean
     public CourseMapper courseMapper() {
         return Mappers.getMapper(CourseMapper.class);
@@ -23,5 +22,4 @@ public class AppConfig {
     public AuthorMapper authorMapper() {
         return Mappers.getMapper(AuthorMapper.class);
     }
-
 }

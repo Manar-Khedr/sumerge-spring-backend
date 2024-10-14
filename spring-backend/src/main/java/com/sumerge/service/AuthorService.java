@@ -1,14 +1,18 @@
 package com.sumerge.service;
 
-import com.sumerge.classes.Author;
+
 import com.sumerge.dto.AuthorDTO;
+import com.sumerge.exception.ResourceNotFoundException;
 import com.sumerge.mapper.AuthorMapper;
 import com.sumerge.repository.AuthorRepository;
+import com.sumerge.springTask3.classes.Author;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import javax.validation.ValidationException;
 
 
 @Service
@@ -24,44 +28,46 @@ public class AuthorService {
         this.authorMapper = authorMapper;
     }
 
-    // methods
-    public AuthorDTO addAuthor(AuthorDTO authorDTO) {
+    public AuthorDTO addAuthor(AuthorDTO authorDTO) throws ValidationException {
+        String authorEmail = authorDTO.getAuthorEmail();
+        if (authorRepository.findByAuthorEmail(authorEmail).isPresent()) {
+            throw new ValidationException("Author with email " + authorEmail + " already exists.");
+        }
         Author author = authorMapper.mapToAuthor(authorDTO);
         Author savedAuthor = authorRepository.save(author);
         return authorMapper.mapToAuthorDTO(savedAuthor);
     }
 
-    public AuthorDTO viewAuthor(int authorId) {
-        return authorRepository.findById(authorId)
-                .map(authorMapper::mapToAuthorDTO)
-                .orElse(null);
+    public AuthorDTO viewAuthorByEmail(String authorEmail) throws ResourceNotFoundException{
+        Author author = authorRepository.findByAuthorEmail(authorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found with email: " + authorEmail));
+        return authorMapper.mapToAuthorDTO(author);
     }
 
-    public AuthorDTO updateAuthor(AuthorDTO authorDTO) {
-        if (authorRepository.existsById(authorDTO.getAuthorId())) {
-            Author author = authorMapper.mapToAuthor(authorDTO);
-            Author updatedAuthor = authorRepository.save(author);
-            return authorMapper.mapToAuthorDTO(updatedAuthor);
-        }
-        return null;
+    // changes here
+    public AuthorDTO updateAuthor(AuthorDTO authorDTO) throws ResourceNotFoundException {
+        String authorEmail = authorDTO.getAuthorEmail();
+        Author existingAuthor = authorRepository.findByAuthorEmail(authorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found with email: " + authorEmail));;
+
+        // Update only the necessary fields
+        existingAuthor.setAuthorName(authorDTO.getAuthorName());
+        existingAuthor.setAuthorBirthDate(authorDTO.getAuthorBirthDate());
+        // Update other fields as needed
+
+        Author updatedAuthor = authorRepository.save(existingAuthor);
+        return authorMapper.mapToAuthorDTO(updatedAuthor);
     }
 
-    public void deleteAuthor(int authorId) {
-        authorRepository.deleteById(authorId);
+    public void deleteAuthorByEmail(String authorEmail) throws ResourceNotFoundException {
+        Author author = authorRepository.findByAuthorEmail(authorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found with email: " + authorEmail));
+        authorRepository.delete(author);
     }
 
-    // view all authors within pagination
     public Page<AuthorDTO> viewAllAuthors(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return authorRepository.findAll(pageable)
                 .map(authorMapper::mapToAuthorDTO);
     }
-
-    // filter author by email
-    public AuthorDTO getAuthorByEmail(String authorEmail) {
-        return authorRepository.findByAuthorEmail(authorEmail)
-                .map(authorMapper::mapToAuthorDTO)
-                .orElse(null);
-    }
-
 }

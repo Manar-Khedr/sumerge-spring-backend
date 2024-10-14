@@ -10,9 +10,6 @@ public interface CourseMapper {
 
     CourseMapper INSTANCE = Mappers.getMapper(CourseMapper.class);
 
-
     Course mapToCourse(CourseDTO courseDTO);
-
-
     CourseDTO mapToCourseDTO(Course course);
 }

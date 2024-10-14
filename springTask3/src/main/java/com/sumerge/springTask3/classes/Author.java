@@ -1,46 +1,38 @@
-package com.sumerge.classes;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.sumerge.springTask3.classes;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "Author")
 public class Author {
 
-    // variables
     @Id
-    @JsonProperty("id")
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int authorId;
 
-    @JsonProperty("name")
-    @Column(name = "name")
     private String authorName;
-
-    @JsonProperty("email")
-    @Column(name = "email")
     private String authorEmail;
-
-    @JsonProperty("birthdate")
-    @Column(name = "birthdate")
     private Date authorBirthDate;
 
-    // default constructor
-    public Author(){
+    @ManyToMany
+    @JoinTable(
+            name = "course_author",
+            joinColumns = @JoinColumn(name = "author_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses;
 
-    }
+    // Default constructor
+    public Author() {}
 
-    public Author(int authorId, String authorName, String authorEmail, Date authorBirthDate){
-        this.authorId = authorId;
-        this.authorName = authorName;
+    public Author(String authorName, String authorEmail){
         this.authorEmail = authorEmail;
-        this.authorBirthDate = authorBirthDate;
+        this.authorName = authorName;
     }
 
-
+    // Getters and setters
     public int getAuthorId() {
         return authorId;
     }
@@ -71,5 +63,13 @@ public class Author {
 
     public void setAuthorBirthDate(Date authorBirthDate) {
         this.authorBirthDate = authorBirthDate;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 }

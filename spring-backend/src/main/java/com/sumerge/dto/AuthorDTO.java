@@ -9,6 +9,16 @@ public class AuthorDTO {
     private String authorEmail;
     private Date authorBirthDate;
 
+
+    //Default constructor
+    public AuthorDTO(){
+    }
+
+    public AuthorDTO(String authorEmail, String authorName){
+        this.authorEmail = authorEmail;
+        this.authorName = authorName;
+    }
+
     public int getAuthorId() {
         return authorId;
     }

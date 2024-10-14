@@ -1,32 +1,30 @@
 package com.sumerge.service;
 
-
 import com.sumerge.dto.CourseDTO;
+import com.sumerge.exception.ResourceNotFoundException;
 import com.sumerge.mapper.CourseMapper;
 import com.sumerge.repository.CourseRepository;
 import com.sumerge.springTask3.classes.Course;
-import com.sumerge.springTask3.implementation.CourseRecommender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import javax.validation.ValidationException;
 
 @Service
 public class CourseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+    //private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
     //private final CourseRecommender courseRecommender;
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
 
     @Autowired
-    public CourseService( CourseRepository courseRepository, CourseMapper courseMapper) {
+    public CourseService(CourseRepository courseRepository, CourseMapper courseMapper) {
         //this.courseRecommender = courseRecommender;
         this.courseRepository = courseRepository;
         this.courseMapper = courseMapper;
@@ -34,36 +32,51 @@ public class CourseService {
 
 
     // add course, use coursedto to mapp between course and coursedto
-    public CourseDTO addCourse(CourseDTO courseDTO) {
-        logger.info("Adding CourseDTO: {}", courseDTO);
+    // Add course
+    public CourseDTO addCourse(CourseDTO courseDTO) throws ValidationException{
+        String courseName = courseDTO.getCourseName();
+        if (courseRepository.findByCourseName(courseName).isPresent()) {
+            throw new ValidationException("Course with name " + courseName + " already exists.");
+        }
         Course course = courseMapper.mapToCourse(courseDTO);
-        logger.info("Mapped Course: {}", course);
         Course savedCourse = courseRepository.save(course);
-        logger.info("Saved Course: {}", savedCourse);
         return courseMapper.mapToCourseDTO(savedCourse);
     }
 
-    public CourseDTO updateCourse(CourseDTO courseDTO) {
-        Course course = courseMapper.mapToCourse(courseDTO);
-        Course updatedCourse = courseRepository.save(course);
+    // Update course
+    public CourseDTO updateCourse(CourseDTO courseDTO) throws ResourceNotFoundException {
+        String courseName = courseDTO.getCourseName();
+        Course existingCourse = courseRepository.findByCourseName(courseName)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with name: " + courseName));;
+
+        // Update only the necessary fields
+        existingCourse.setCourseName(courseDTO.getCourseName());
+        existingCourse.setCourseDescription(courseDTO.getCourseDescription());
+        existingCourse.setCourseCredit(courseDTO.getCourseCredit());
+        // Update other fields as needed
+
+        Course updatedCourse = courseRepository.save(existingCourse);
         return courseMapper.mapToCourseDTO(updatedCourse);
     }
 
-    public void deleteCourse(int courseId) {
-        courseRepository.deleteById(courseId);
+    // Delete course
+    public void deleteCourse(String courseName) throws ResourceNotFoundException{
+        Course course = courseRepository.findByCourseName(courseName)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with name: " + courseName));
+        courseRepository.delete(course);
     }
 
-    public CourseDTO viewCourse(int courseId) {
-        return courseRepository.findById(courseId)
-                .map(courseMapper::mapToCourseDTO)
-                .orElse(null);
+    // View course
+    public CourseDTO viewCourse(String courseName) throws ResourceNotFoundException {
+        Course course = courseRepository.findByCourseName(courseName)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with name: " + courseName));
+        return courseMapper.mapToCourseDTO(course);
     }
 
-    public Page<CourseDTO> viewAllCourses(int page, int size){
+    // View all courses with pagination
+    public Page<CourseDTO> viewAllCourses(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return courseRepository.findAll(pageable)
                 .map(courseMapper::mapToCourseDTO);
     }
-
-
 }
