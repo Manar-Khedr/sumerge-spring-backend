@@ -1,7 +1,8 @@
 package com.sumerge.service;
 
-import com.sumerge.classes.Course;
-import com.sumerge.implementation.CourseRecommender;
+
+import com.sumerge.springTask3.classes.Course;
+import com.sumerge.springTask3.implementation.CourseRecommender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

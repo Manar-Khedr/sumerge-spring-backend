@@ -1,4 +1,4 @@
-package com.sumerge.classes;
+package com.sumerge.springTask3.classes;
 
 public class Course {
 
