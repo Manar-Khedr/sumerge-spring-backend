@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import java.util.Set;
 
+import javax.persistence.*;
+
 @Entity
 @Table(name = "course")
 public class Course {
@@ -19,6 +21,7 @@ public class Course {
 
     @ManyToMany(mappedBy = "courses")
     private Set<Author> authors;
+
 
     // Default constructor
     public Course() {}
@@ -69,6 +72,4 @@ public class Course {
     public void setAuthors(Set<Author> authors) {
         this.authors = authors;
     }
-
-
 }
