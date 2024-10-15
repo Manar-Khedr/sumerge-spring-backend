@@ -30,8 +30,6 @@ public class CourseService {
         this.courseMapper = courseMapper;
     }
 
-
-    // add course, use coursedto to mapp between course and coursedto
     // Add course
     public CourseDTO addCourse(CourseDTO courseDTO) throws ValidationException{
         String courseName = courseDTO.getCourseName();
