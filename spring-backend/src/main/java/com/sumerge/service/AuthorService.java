@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 
 import javax.validation.ValidationException;
 
-
 @Service
 public class AuthorService {
 
